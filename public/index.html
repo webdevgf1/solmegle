@@ -606,166 +606,42 @@
         let peerConnection = null;
         let ws = null;
 
-        // WebRTC Configuration (same as Ajnabee)
-        const iceConfig = {
-            iceServers: [
-                { urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }
-            ]
-        };
-
-        // WebSocket connection for real peer matching
+        // Simple WebSocket simulation (like Ajnabee's structure)
         function createWebSocket() {
-            // In a real deployment, this would connect to your backend
-            // For now, we'll simulate the connection but use real WebRTC
-            console.log('WebSocket connection would go here');
+            console.log('Looking for peer...');
             
-            // Simulate finding a peer after delay
+            // Simulate WebSocket matching delay
             setTimeout(() => {
                 if (videoState === 'searching') {
-                    initiatePeerConnection();
+                    connectToStranger();
                 }
-            }, 3000 + Math.random() * 3000);
+            }, 2000 + Math.random() * 3000);
         }
 
-        // Real WebRTC peer connection setup (like Ajnabee)
-        async function initiatePeerConnection() {
-            try {
-                peerConnection = new RTCPeerConnection(iceConfig);
-                
-                // Add local stream to peer connection
-                if (localStream) {
-                    localStream.getTracks().forEach(track => {
-                        peerConnection.addTrack(track, localStream);
-                    });
-                }
-
-                // Handle incoming video stream
-                peerConnection.ontrack = (event) => {
-                    console.log('Received remote stream');
-                    document.getElementById('peerVideo').srcObject = event.streams[0];
-                    videoState = 'connected';
-                    
-                    const messages = document.getElementById('videoMessages');
-                    messages.innerHTML = '<div class="message-status">Connected! You are now video chatting.</div>';
-                    
-                    document.getElementById('peerOverlay').textContent = '@stranger_user';
-                };
-
-                // Handle ICE candidates
-                peerConnection.onicecandidate = (event) => {
-                    if (event.candidate) {
-                        console.log('ICE candidate:', event.candidate);
-                        // In real app, send this to the other peer via WebSocket
-                    }
-                };
-
-                // Create offer for peer connection
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-                
-                console.log('Created offer, waiting for answer...');
-                
-                // For demo purposes, we'll create a fake peer connection
-                // In real app, this offer would be sent to another user
-                simulateRemotePeer();
-                
-            } catch (error) {
-                console.error('Error creating peer connection:', error);
-            }
-        }
-
-        // Simulate remote peer for demo (in real app, this wouldn't exist)
-        async function simulateRemotePeer() {
-            try {
-                // Create a second peer connection to simulate the remote user
-                const remotePeerConnection = new RTCPeerConnection(iceConfig);
-                
-                // Try to get a second camera stream, or create animated content
-                let fakeStream;
-                try {
-                    // Try to get another camera if available
-                    fakeStream = await navigator.mediaDevices.getUserMedia({
-                        video: { width: 640, height: 480 },
-                        audio: false
-                    });
-                } catch (e) {
-                    // If no second camera, create animated content
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 640;
-                    canvas.height = 480;
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Create animated gradient background
-                    function drawFrame() {
-                        const time = Date.now() * 0.001;
-                        
-                        // Create animated gradient
-                        const gradient = ctx.createRadialGradient(320, 240, 0, 320, 240, 300);
-                        gradient.addColorStop(0, `hsl(${time * 30 % 360}, 70%, 50%)`);
-                        gradient.addColorStop(0.5, `hsl(${(time * 30 + 60) % 360}, 60%, 40%)`);
-                        gradient.addColorStop(1, `hsl(${(time * 30 + 120) % 360}, 50%, 30%)`);
-                        
-                        ctx.fillStyle = gradient;
-                        ctx.fillRect(0, 0, 640, 480);
-                        
-                        // Add floating particles
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                        for (let i = 0; i < 20; i++) {
-                            const x = 320 + Math.sin(time + i) * 200;
-                            const y = 240 + Math.cos(time * 0.8 + i) * 150;
-                            const size = 3 + Math.sin(time * 2 + i) * 2;
-                            ctx.beginPath();
-                            ctx.arc(x, y, size, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        
-                        // Add center text
-                        ctx.fillStyle = 'white';
-                        ctx.font = 'bold 28px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.strokeStyle = 'black';
-                        ctx.lineWidth = 2;
-                        ctx.strokeText('Connected User', 320, 240);
-                        ctx.fillText('Connected User', 320, 240);
-                        
-                        requestAnimationFrame(drawFrame);
-                    }
-                    drawFrame();
-                    
-                    fakeStream = canvas.captureStream(30);
-                }
-                
-                // Add stream to remote peer connection
-                fakeStream.getTracks().forEach(track => {
-                    remotePeerConnection.addTrack(track, fakeStream);
-                });
-
-                // Connect the two peer connections
-                remotePeerConnection.onicecandidate = async (event) => {
-                    if (event.candidate) {
-                        await peerConnection.addIceCandidate(event.candidate);
-                    }
-                };
-
-                peerConnection.onicecandidate = async (event) => {
-                    if (event.candidate) {
-                        await remotePeerConnection.addIceCandidate(event.candidate);
-                    }
-                };
-
-                // Exchange offers/answers
-                const offer = peerConnection.localDescription;
-                await remotePeerConnection.setRemoteDescription(offer);
-                
-                const answer = await remotePeerConnection.createAnswer();
-                await remotePeerConnection.setLocalDescription(answer);
-                await peerConnection.setRemoteDescription(answer);
-                
-                console.log('Peer connection established!');
-                
-            } catch (error) {
-                console.error('Error in peer connection:', error);
-            }
+        function connectToStranger() {
+            videoState = 'connected';
+            const messages = document.getElementById('videoMessages');
+            messages.innerHTML = '<div class="message-status">Connected! You are now video chatting with a stranger.</div>';
+            
+            // Create simple fake peer video (not your own camera)
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            
+            // Static stranger placeholder
+            ctx.fillStyle = '#2a2a2a';
+            ctx.fillRect(0, 0, 640, 480);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Stranger', 320, 240);
+            ctx.font = '16px Arial';
+            ctx.fillText('Video will appear here', 320, 280);
+            
+            const fakeStream = canvas.captureStream();
+            document.getElementById('peerVideo').srcObject = fakeStream;
+            document.getElementById('peerOverlay').textContent = '@stranger_user';
         }
 
         // Window management
@@ -988,21 +864,14 @@
         }
 
         function skipVideo() {
-            // Close current peer connection
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            
-            // Clear peer video
+            videoState = 'searching';
             document.getElementById('peerVideo').srcObject = null;
             document.getElementById('peerOverlay').textContent = 'Stranger';
             
-            videoState = 'searching';
             const messages = document.getElementById('videoMessages');
             messages.innerHTML = '<div class="message-status">Looking for someone new...</div>';
             
-            // Look for new peer
+            // Look for new stranger
             createWebSocket();
         }
 
