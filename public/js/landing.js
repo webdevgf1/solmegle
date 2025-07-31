@@ -81,7 +81,7 @@ function startGroupChat() {
     if (twitterHandle) {
         params.set('twitter', twitterHandle);
     }
-    window.location.href = '/chat?' + params.toString();
+    window.location.href = 'chat.html?' + params.toString();
 }
 
 function startVideoChat() {
@@ -92,7 +92,7 @@ function startVideoChat() {
     if (twitterHandle) {
         params.set('twitter', twitterHandle);
     }
-    window.location.href = '/video?' + params.toString();
+    window.location.href = 'video.html?' + params.toString();
 }
 
 // Close modal when clicking outside
