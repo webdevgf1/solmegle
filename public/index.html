@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solmegle - Anonymous Chat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💻</text></svg>">
     <style>
         * {
             margin: 0;
@@ -26,9 +27,6 @@
             height: 100vh;
             background: #008080;
             position: relative;
-            background-image: 
-                radial-gradient(circle at 25% 25%, #008080 0%, #004040 50%),
-                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABklEQVQIHWPY9+8fAzYwirkTAAAAAElFTkSuQmCC');
         }
         
         /* Desktop Icons */
@@ -102,6 +100,7 @@
             align-items: center;
             height: 18px;
             font-size: 11px;
+            cursor: move;
         }
         
         .window-title {
@@ -933,7 +932,7 @@
     
     <!-- Taskbar -->
     <div class="taskbar">
-        <div class="start-button" onclick="toggleStartMenu()">
+        <div class="start-button">
             <span>Start</span>
         </div>
         <div class="taskbar-separator"></div>
@@ -943,6 +942,10 @@
         <div class="taskbar-time" id="taskbarTime">12:00 PM</div>
     </div>
 
+    <script>
+        // Global variables
+        let allTags = [];
+        let twitterHandle = '';
     <script>
         // Global variables
         let allTags = [];
