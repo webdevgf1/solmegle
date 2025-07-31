@@ -1,70 +1,129 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat App</title>
-  <link rel="icon" href="img/favicon.png" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/chat.css" />
-  <link rel="stylesheet" href="css/chat-phone.css" />
-  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-  <link rel="manifest" href="favicon/site.webmanifest">
-  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
-  <meta name="favicon/msapplication-TileColor" content="#da532c">
-  <meta name="favicon/theme-color" content="#333333">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solmegle - Group Calls</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/groups.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="favicon/msapplication-TileColor" content="#da532c">
+    <meta name="favicon/theme-color" content="#333333">
 </head>
-
 <body>
-  <div id="main">
-    <!-- top bar -->
-    <div id="top-bar">
-      <div id="logo">
-        <img src="/assets/logo.svg" alt="Ajnabee">
-      </div>
-      <div id="top-right">
-        <div id="peopleOnline">
-          <p><span>0</span>+ online now</p>
+    <!-- Main Container -->
+    <div class="main-container" id="mainContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo" onclick="window.location.href='/'">Solmegle</div>
+            <div class="header-actions">
+                <button class="create-group-btn" onclick="openCreateModal()">Create Group</button>
+                <button class="feedback-btn">Feedback</button>
+            </div>
         </div>
-        <button id="feedback-btn" class="button">Provide Feedback</button>
-      </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="page-title">
+                <h1>Community Groups</h1>
+                <p>Join video calls with your favorite crypto communities</p>
+            </div>
+
+            <!-- Groups Grid -->
+            <div class="groups-grid" id="groupsGrid">
+                <!-- Groups will be loaded from backend -->
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <h3>No groups yet</h3>
+                <p>Be the first to create a community group!</p>
+                <button class="create-group-btn" onclick="openCreateModal()">Create First Group</button>
+            </div>
+        </div>
     </div>
 
-    <!-- message area -->
-    <div id="message-area">
-      <div id="messages"></div>
-      <div id="typing" style="display: none" class="message">Stranger is typing...</div>
+    <!-- Create Group Modal -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Create Community Group</h2>
+                <button class="close-btn" onclick="closeCreateModal()">&times;</button>
+            </div>
+
+            <form id="createGroupForm" onsubmit="createGroup(event)">
+                <div class="form-group">
+                    <label class="form-label">Group Name *</label>
+                    <input type="text" class="form-input" name="groupName" placeholder="e.g., Solana Builders" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input form-textarea" name="description" placeholder="What's your group about?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Banner Image</label>
+                    <div class="upload-area" onclick="document.getElementById('bannerUpload').click()">
+                        <div class="upload-text">Click to upload banner</div>
+                        <div class="upload-subtext">Recommended: 800x200px</div>
+                    </div>
+                    <input type="file" id="bannerUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(this, 'banner')">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Profile Picture</label>
+                    <div class="upload-area" onclick="document.getElementById('pfpUpload').click()">
+                        <div class="upload-text">Click to upload profile picture</div>
+                        <div class="upload-subtext">Recommended: 200x200px</div>
+                    </div>
+                    <input type="file" id="pfpUpload" accept="image/*" style="display: none;" onchange="handleFileUpload(this, 'pfp')">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Token Ticker *</label>
+                        <input type="text" class="form-input" name="ticker" placeholder="e.g., $SOL" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Token Name *</label>
+                        <input type="text" class="form-input" name="tokenName" placeholder="e.g., Solana" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Contract Address</label>
+                    <input type="text" class="form-input" name="contractAddress" placeholder="0x... or So11...">
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="create-btn">Create Group</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- input area -->
-    <div id="input-area">
-      <button class="button" id="skip-btn">Skip<span>Esc</span></button>
-      <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" />
-      <button class="button" id="send-btn">Send<span>Enter</span></button>
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Send Feedback</h2>
+            <form onsubmit="submitFeedback(event)">
+                <textarea id="feedbackText" placeholder="Your feedback..." required></textarea>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
     </div>
-  </div>
 
-  <!-- feedback popup -->
-  <div id="feedbackModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Provide Feedback</h2>
-      <form id="feedbackForm">
-        <textarea id="feedbackText" rows="10" placeholder="Your feedback..." required></textarea>
-        <input type="submit" class="button" id="submit-btn" value="Submit" />
-      </form>
-    </div>
-  </div>
-
-  <script defer src="./js/main.js"></script>
-  <script defer src="./js/chat.js" type="module"></script>
+    <script defer src="./js/main.js"></script>
+    <script defer src="./js/groups.js"></script>
 </body>
-
 </html>
