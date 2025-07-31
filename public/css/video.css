@@ -1,0 +1,422 @@
+/* Video Chat Page Specific Styles */
+.main-container {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    grid-template-rows: 80px 1fr 80px;
+    grid-template-areas:
+        'header header'
+        'video messages'
+        'video input';
+    transition: filter 0.3s ease;
+}
+
+.main-container.blurred {
+    filter: blur(8px);
+}
+
+/* Video Container */
+.video-container {
+    grid-area: video;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.video-feed {
+    position: relative;
+    flex: 1;
+    background: #1a1a2e;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.peer-video {
+    flex: 2;
+}
+
+.self-video {
+    flex: 1;
+}
+
+.video-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #1a1a2e;
+}
+
+.video-overlay {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.twitter-handle {
+    color: #1da1f2;
+}
+
+.loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Messages Area */
+.messages-area {
+    grid-area: messages;
+    padding: 1rem;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message-status {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    border-radius: 12px;
+    max-width: 90%;
+    font-size: 0.9rem;
+}
+
+.message.you {
+    background: rgba(102, 126, 234, 0.2);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    margin-left: auto;
+}
+
+.message.stranger {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.message-label {
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+}
+
+.message.you .message-label {
+    color: #667eea;
+}
+
+.message.stranger .message-label {
+    color: #4caf50;
+}
+
+.typing-indicator {
+    display: none;
+    font-style: italic;
+    color: #a0a0a0;
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+/* Input Area */
+.input-area {
+    grid-area: input;
+    display: flex;
+    padding: 1rem;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+.skip-btn {
+    padding: 0.8rem 1.5rem;
+    background: rgba(255, 107, 107, 0.2);
+    border: 1px solid rgba(255, 107, 107, 0.4);
+    border-radius: 12px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.skip-btn:hover {
+    background: rgba(255, 107, 107, 0.3);
+    transform: translateY(-2px);
+}
+
+.message-input {
+    flex: 1;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    color: white;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.message-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+}
+
+.message-input::placeholder {
+    color: #a0a0a0;
+}
+
+.send-btn {
+    padding: 0.8rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Onboarding Modal */
+.onboarding-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.onboarding-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.onboarding-modal .modal-content {
+    background: rgba(20, 20, 40, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 3rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.onboarding-modal.active .modal-content {
+    transform: scale(1);
+}
+
+.slide {
+    display: none;
+}
+
+.slide.active {
+    display: block;
+}
+
+.slide-image {
+    width: 100%;
+    max-width: 400px;
+    height: 200px;
+    margin: 0 auto 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.slide-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.slide h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.slide p {
+    color: #a0a0a0;
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.modal-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 3rem;
+}
+
+.nav-btn {
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.next-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.next-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.progress-dots {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.dot.active {
+    background: #667eea;
+    transform: scale(1.2);
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .main-container {
+        grid-template-columns: 1fr 350px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px 1fr 200px 60px;
+        grid-template-areas:
+            'header'
+            'video'
+            'messages'
+            'input';
+    }
+    
+    .video-container {
+        flex-direction: row;
+    }
+    
+    .peer-video {
+        flex: 2;
+    }
+    
+    .self-video {
+        flex: 1;
+        margin-left: 1rem;
+    }
+    
+    .onboarding-modal .modal-content {
+        padding: 2rem;
+        margin: 1rem;
+    }
+    
+    .slide h2 {
+        font-size: 1.5rem;
+    }
+    
+    .slide p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-container {
+        flex-direction: column;
+    }
+    
+    .self-video {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+}
