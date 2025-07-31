@@ -94,7 +94,7 @@ function joinGroup(groupId) {
         params.set('twitter', twitterHandle);
     }
     
-    window.location.href = '/group-call?' + params.toString();
+    window.location.href = 'group-call.html?' + params.toString();
 }
 
 // Load groups from backend
