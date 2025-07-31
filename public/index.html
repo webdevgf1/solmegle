@@ -680,37 +680,62 @@
                 // Create a second peer connection to simulate the remote user
                 const remotePeerConnection = new RTCPeerConnection(iceConfig);
                 
-                // Create fake remote video stream
-                const canvas = document.createElement('canvas');
-                canvas.width = 640;
-                canvas.height = 480;
-                const ctx = canvas.getContext('2d');
-                
-                // Animate the fake video
-                function drawFrame() {
-                    // Create moving pattern for demo
-                    const time = Date.now() * 0.002;
-                    const gradient = ctx.createLinearGradient(0, 0, 640, 480);
-                    gradient.addColorStop(0, `hsl(${time * 50 % 360}, 50%, 30%)`);
-                    gradient.addColorStop(1, `hsl(${(time * 50 + 180) % 360}, 50%, 50%)`);
+                // Try to get a second camera stream, or create animated content
+                let fakeStream;
+                try {
+                    // Try to get another camera if available
+                    fakeStream = await navigator.mediaDevices.getUserMedia({
+                        video: { width: 640, height: 480 },
+                        audio: false
+                    });
+                } catch (e) {
+                    // If no second camera, create animated content
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 640;
+                    canvas.height = 480;
+                    const ctx = canvas.getContext('2d');
                     
-                    ctx.fillStyle = gradient;
-                    ctx.fillRect(0, 0, 640, 480);
+                    // Create animated gradient background
+                    function drawFrame() {
+                        const time = Date.now() * 0.001;
+                        
+                        // Create animated gradient
+                        const gradient = ctx.createRadialGradient(320, 240, 0, 320, 240, 300);
+                        gradient.addColorStop(0, `hsl(${time * 30 % 360}, 70%, 50%)`);
+                        gradient.addColorStop(0.5, `hsl(${(time * 30 + 60) % 360}, 60%, 40%)`);
+                        gradient.addColorStop(1, `hsl(${(time * 30 + 120) % 360}, 50%, 30%)`);
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(0, 0, 640, 480);
+                        
+                        // Add floating particles
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        for (let i = 0; i < 20; i++) {
+                            const x = 320 + Math.sin(time + i) * 200;
+                            const y = 240 + Math.cos(time * 0.8 + i) * 150;
+                            const size = 3 + Math.sin(time * 2 + i) * 2;
+                            ctx.beginPath();
+                            ctx.arc(x, y, size, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        
+                        // Add center text
+                        ctx.fillStyle = 'white';
+                        ctx.font = 'bold 28px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.strokeStyle = 'black';
+                        ctx.lineWidth = 2;
+                        ctx.strokeText('Connected User', 320, 240);
+                        ctx.fillText('Connected User', 320, 240);
+                        
+                        requestAnimationFrame(drawFrame);
+                    }
+                    drawFrame();
                     
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = '24px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.fillText('Stranger\'s Video Feed', 320, 240);
-                    ctx.font = '16px Arial';
-                    ctx.fillText('(Simulated for demo)', 320, 270);
-                    
-                    requestAnimationFrame(drawFrame);
+                    fakeStream = canvas.captureStream(30);
                 }
-                drawFrame();
                 
-                const fakeStream = canvas.captureStream(30);
-                
-                // Add fake stream to remote peer connection
+                // Add stream to remote peer connection
                 fakeStream.getTracks().forEach(track => {
                     remotePeerConnection.addTrack(track, fakeStream);
                 });
@@ -739,7 +764,7 @@
                 console.log('Peer connection established!');
                 
             } catch (error) {
-                console.error('Error in simulated peer connection:', error);
+                console.error('Error in peer connection:', error);
             }
         }
 
