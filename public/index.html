@@ -3,88 +3,1583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solmegle</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
-    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="favicon/msapplication-TileColor" content="#da532c">
-    <meta name="favicon/theme-color" content="#333333">
+    <title>Solmegle - Anonymous Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'MS Sans Serif', sans-serif;
+            font-size: 11px;
+            background: #008080;
+            overflow: hidden;
+            height: 100vh;
+            cursor: default;
+        }
+        
+        /* Desktop */
+        .desktop {
+            width: 100vw;
+            height: 100vh;
+            background: #008080;
+            position: relative;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #008080 0%, #004040 50%),
+                url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAABklEQVQIHWPY9+8fAzYwirkTAAAAAElFTkSuQmCC');
+        }
+        
+        /* Desktop Icons */
+        .desktop-icon {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 2px;
+        }
+        
+        .desktop-icon:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .desktop-icon.selected {
+            background: rgba(0,0,139,0.8);
+        }
+        
+        .icon-image {
+            width: 32px;
+            height: 32px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .icon-label {
+            text-align: center;
+            font-size: 11px;
+            line-height: 12px;
+            max-width: 70px;
+            word-wrap: break-word;
+        }
+        
+        /* Windows */
+        .window {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            min-width: 300px;
+            min-height: 200px;
+            display: none;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .window.active {
+            display: block;
+            z-index: 1000;
+        }
+        
+        .window-header {
+            background: linear-gradient(90deg, #0000ff 0%, #4080ff 100%);
+            color: white;
+            padding: 2px 4px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 18px;
+            font-size: 11px;
+        }
+        
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .window-controls {
+            display: flex;
+            gap: 2px;
+        }
+        
+        .window-control {
+            width: 16px;
+            height: 14px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 8px;
+            font-weight: bold;
+            color: #000;
+        }
+        
+        .window-control:active {
+            border: 1px inset #c0c0c0;
+        }
+        
+        .window-content {
+            padding: 8px;
+            height: calc(100% - 18px);
+            overflow: auto;
+        }
+        
+        /* Chat Window Specific */
+        .chat-window {
+            width: 600px;
+            height: 400px;
+            top: 50px;
+            left: 100px;
+        }
+        
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .chat-setup {
+            border: 1px inset #c0c0c0;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #f0f0f0;
+        }
+        
+        .form-group {
+            margin-bottom: 8px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 2px 4px;
+            border: 1px inset #c0c0c0;
+            background: white;
+            font-family: inherit;
+            font-size: 11px;
+        }
+        
+        .twitter-input {
+            position: relative;
+        }
+        
+        .twitter-input::before {
+            content: '@';
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            z-index: 1;
+        }
+        
+        .twitter-input input {
+            padding-left: 16px;
+        }
+        
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+            min-height: 20px;
+            border: 1px inset #c0c0c0;
+            padding: 4px;
+            background: white;
+        }
+        
+        .tag {
+            background: #0080ff;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 0;
+            font-size: 10px;
+            cursor: pointer;
+            border: 1px solid #0060df;
+        }
+        
+        .tag:hover {
+            background: #0060df;
+        }
+        
+        .btn {
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            padding: 4px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 11px;
+            margin: 2px;
+        }
+        
+        .btn:active {
+            border: 1px inset #c0c0c0;
+        }
+        
+        .btn:disabled {
+            background: #a0a0a0;
+            color: #808080;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: #0080ff;
+            color: white;
+            border: 1px outset #0080ff;
+        }
+        
+        .btn-primary:active {
+            border: 1px inset #0080ff;
+        }
+        
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px inset #c0c0c0;
+            background: white;
+        }
+        
+        .messages {
+            flex: 1;
+            padding: 8px;
+            overflow-y: auto;
+            border-bottom: 1px solid #c0c0c0;
+        }
+        
+        .message {
+            margin-bottom: 4px;
+            font-size: 11px;
+        }
+        
+        .message-status {
+            color: #008000;
+            font-style: italic;
+            text-align: center;
+            margin: 8px 0;
+        }
+        
+        .message-you {
+            color: #0000ff;
+        }
+        
+        .message-stranger {
+            color: #ff0000;
+        }
+        
+        .typing-indicator {
+            color: #808080;
+            font-style: italic;
+            padding: 4px 8px;
+            display: none;
+        }
+        
+        .input-area {
+            display: flex;
+            padding: 4px;
+            gap: 4px;
+            background: #f0f0f0;
+        }
+        
+        .message-input {
+            flex: 1;
+            padding: 2px 4px;
+            border: 1px inset #c0c0c0;
+            font-family: inherit;
+            font-size: 11px;
+        }
+        
+        /* Video Window */
+        .video-window {
+            width: 800px;
+            height: 600px;
+            top: 100px;
+            left: 200px;
+        }
+        
+        .video-container {
+            display: flex;
+            height: 100%;
+            gap: 8px;
+        }
+        
+        .video-main {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .video-feed {
+            flex: 1;
+            background: #000;
+            border: 1px inset #c0c0c0;
+            position: relative;
+            margin-bottom: 8px;
+        }
+        
+        .video-peer {
+            flex: 3;
+        }
+        
+        .video-self {
+            flex: 1;
+        }
+        
+        .video-element {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(192,192,192,0.9);
+            padding: 2px 6px;
+            border: 1px solid #808080;
+            font-size: 10px;
+        }
+        
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+        }
+        
+        .video-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 250px;
+        }
+        
+        /* Groups Window */
+        .groups-window {
+            width: 700px;
+            height: 500px;
+            top: 80px;
+            left: 150px;
+        }
+        
+        .groups-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #808080;
+        }
+        
+        .groups-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            border: 1px inset #c0c0c0;
+            padding: 8px;
+            background: white;
+        }
+        
+        .group-card {
+            border: 1px outset #c0c0c0;
+            padding: 8px;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .group-card:hover {
+            background: #e0e0e0;
+        }
+        
+        .group-card:active {
+            border: 1px inset #c0c0c0;
+        }
+        
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .group-icon {
+            width: 24px;
+            height: 24px;
+            background: #0080ff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        
+        .group-name {
+            font-weight: bold;
+            font-size: 11px;
+        }
+        
+        .group-ticker {
+            color: #0080ff;
+            font-size: 10px;
+        }
+        
+        .group-description {
+            font-size: 10px;
+            margin-bottom: 8px;
+            color: #606060;
+        }
+        
+        .group-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: #808080;
+        }
+        
+        /* Group Call Window */
+        .group-call-window {
+            width: 900px;
+            height: 700px;
+            top: 60px;
+            left: 120px;
+        }
+        
+        .group-call-container {
+            display: flex;
+            height: 100%;
+            gap: 8px;
+        }
+        
+        .participants-grid {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            background: #000;
+            border: 1px inset #c0c0c0;
+            padding: 4px;
+        }
+        
+        .participant {
+            background: #202020;
+            border: 1px solid #404040;
+            position: relative;
+            min-height: 150px;
+        }
+        
+        .participant.speaking {
+            border: 2px solid #00ff00;
+        }
+        
+        .participant-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .participant-overlay {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(192,192,192,0.9);
+            padding: 2px 4px;
+            font-size: 9px;
+        }
+        
+        .group-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 200px;
+        }
+        
+        .group-chat-header {
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+            padding: 4px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .group-controls {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px inset #c0c0c0;
+            margin-top: 8px;
+        }
+        
+        .control-btn {
+            width: 32px;
+            height: 32px;
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 10px;
+        }
+        
+        .control-btn:active {
+            border: 1px inset #c0c0c0;
+        }
+        
+        .control-btn.active {
+            background: #ff4040;
+            color: white;
+        }
+        
+        /* Create Group Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-window {
+            width: 400px;
+            height: 500px;
+            background: #c0c0c0;
+            border: 2px outset #c0c0c0;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .modal-content {
+            padding: 8px;
+            height: calc(100% - 18px);
+            overflow-y: auto;
+        }
+        
+        .form-textarea {
+            height: 60px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 16px;
+            padding-top: 8px;
+            border-top: 1px solid #808080;
+        }
+        
+        /* Taskbar */
+        .taskbar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: #c0c0c0;
+            border-top: 1px solid #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            z-index: 3000;
+        }
+        
+        .start-button {
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+        }
+        
+        .start-button:active {
+            border: 1px inset #c0c0c0;
+        }
+        
+        .taskbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #808080;
+            margin: 0 4px;
+        }
+        
+        .taskbar-items {
+            display: flex;
+            gap: 2px;
+            flex: 1;
+        }
+        
+        .taskbar-item {
+            background: #c0c0c0;
+            border: 1px outset #c0c0c0;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .taskbar-item.active {
+            border: 1px inset #c0c0c0;
+            background: #a0a0a0;
+        }
+        
+        .taskbar-time {
+            background: #c0c0c0;
+            border: 1px inset #c0c0c0;
+            padding: 4px 8px;
+            font-size: 11px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .window {
+                width: 95% !important;
+                height: 90% !important;
+                top: 5% !important;
+                left: 2.5% !important;
+            }
+            
+            .participants-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .video-container {
+                flex-direction: column;
+            }
+            
+            .desktop-icon {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .icon-image {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Intro Animation -->
-    <div class="intro-screen">
-        <div class="spline-container">
-            <div class="spline-orb"></div>
+    <!-- Desktop -->
+    <div class="desktop" id="desktop">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" style="top: 20px; left: 20px;" onclick="openWindow('chatWindow')">
+            <div class="icon-image">CHAT</div>
+            <div class="icon-label">Anonymous Chat</div>
         </div>
-        <div class="brand-text">
-            <h1 class="brand-title">Solmegle</h1>
-            <p class="brand-tagline">Connect Anonymously</p>
+        
+        <div class="desktop-icon" style="top: 120px; left: 20px;" onclick="openWindow('videoWindow')">
+            <div class="icon-image">VID</div>
+            <div class="icon-label">Video Chat</div>
+        </div>
+        
+        <div class="desktop-icon" style="top: 220px; left: 20px;" onclick="openWindow('groupsWindow')">
+            <div class="icon-image">GRP</div>
+            <div class="icon-label">Community Groups</div>
+        </div>
+        
+        <!-- Chat Window -->
+        <div class="window chat-window" id="chatWindow">
+            <div class="window-header">
+                <div class="window-title">Anonymous Chat - Solmegle</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('chatWindow')">_</div>
+                    <div class="window-control" onclick="closeWindow('chatWindow')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="chat-container">
+                    <div class="chat-setup">
+                        <div class="form-group">
+                            <label class="form-label">Interests (optional):</label>
+                            <input type="text" class="form-input" id="interests" placeholder="Add interests, press Enter">
+                            <div class="tags-container" id="tagsContainer"></div>
+                        </div>
+                        
+                        <div class="form-group twitter-input">
+                            <label class="form-label">Twitter Handle (optional):</label>
+                            <input type="text" class="form-input" id="twitterHandle" placeholder="your_handle">
+                        </div>
+                        
+                        <div class="btn-row">
+                            <button class="btn btn-primary" onclick="startChat()" id="startChatBtn">Start Chat</button>
+                            <button class="btn" onclick="openWindow('videoWindow')">Video Instead</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-area" id="chatArea" style="display: none;">
+                        <div class="messages" id="messages">
+                            <div class="message-status">Click "Start Chat" to find someone to talk to...</div>
+                        </div>
+                        <div class="typing-indicator" id="typingIndicator">Stranger is typing...</div>
+                        <div class="input-area">
+                            <button class="btn" onclick="skipStranger()" id="skipBtn" disabled>Skip</button>
+                            <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." disabled>
+                            <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn" disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Window -->
+        <div class="window video-window" id="videoWindow">
+            <div class="window-header">
+                <div class="window-title">Video Chat - Solmegle</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('videoWindow')">_</div>
+                    <div class="window-control" onclick="closeWindow('videoWindow')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="video-container">
+                    <div class="video-main">
+                        <div class="video-feed video-peer">
+                            <video class="video-element" id="peerVideo" autoplay playsinline></video>
+                            <div class="video-overlay" id="peerOverlay" style="display: none;">@stranger</div>
+                        </div>
+                        <div class="video-feed video-self">
+                            <video class="video-element" id="selfVideo" autoplay playsinline muted></video>
+                            <div class="video-overlay" id="selfOverlay" style="display: none;">@you</div>
+                        </div>
+                        <div class="video-controls">
+                            <button class="btn" onclick="toggleMute()" id="muteBtn">Mute</button>
+                            <button class="btn" onclick="toggleVideo()" id="videoBtn">Video Off</button>
+                            <button class="btn" onclick="skipVideo()" id="skipVideoBtn">Skip</button>
+                            <button class="btn btn-primary" onclick="startVideoChat()" id="startVideoBtn">Start Video</button>
+                        </div>
+                    </div>
+                    <div class="video-chat">
+                        <div class="chat-area">
+                            <div class="messages" id="videoMessages">
+                                <div class="message-status">Video chat messages will appear here</div>
+                            </div>
+                            <div class="input-area">
+                                <input type="text" class="message-input" id="videoMessageInput" placeholder="Type a message..." disabled>
+                                <button class="btn" onclick="sendVideoMessage()" disabled>Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Groups Window -->
+        <div class="window groups-window" id="groupsWindow">
+            <div class="window-header">
+                <div class="window-title">Community Groups - Solmegle</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('groupsWindow')">_</div>
+                    <div class="window-control" onclick="closeWindow('groupsWindow')">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="groups-header">
+                    <div style="font-weight: bold;">Join a Community Group</div>
+                    <button class="btn btn-primary" onclick="openCreateGroupModal()">Create Group</button>
+                </div>
+                <div class="groups-grid" id="groupsGrid">
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #808080;">
+                        No groups created yet. Be the first to start a community!
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Group Call Window -->
+        <div class="window group-call-window" id="groupCallWindow">
+            <div class="window-header">
+                <div class="window-title" id="groupCallTitle">Group Call - Loading...</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="minimizeWindow('groupCallWindow')">_</div>
+                    <div class="window-control" onclick="leaveGroupCall()">X</div>
+                </div>
+            </div>
+            <div class="window-content">
+                <div class="group-call-container">
+                    <div>
+                        <div class="participants-grid" id="participantsGrid">
+                            <!-- Participants will be added here -->
+                        </div>
+                        <div class="group-controls">
+                            <button class="control-btn" onclick="toggleGroupMute()" id="groupMuteBtn" title="Mute">MIC</button>
+                            <button class="control-btn" onclick="toggleGroupVideo()" id="groupVideoBtn" title="Video">VID</button>
+                            <button class="control-btn" onclick="toggleScreenShare()" id="screenBtn" title="Share">SCR</button>
+                            <button class="btn" onclick="leaveGroupCall()" style="margin-left: 8px;">Leave</button>
+                        </div>
+                    </div>
+                    <div class="group-chat">
+                        <div class="group-chat-header">Group Chat</div>
+                        <div class="chat-area">
+                            <div class="messages" id="groupMessages">
+                                <div class="message-status">Welcome to the group call!</div>
+                            </div>
+                            <div class="input-area">
+                                <input type="text" class="message-input" id="groupMessageInput" placeholder="Type a message...">
+                                <button class="btn" onclick="sendGroupMessage()">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
+    <!-- Create Group Modal -->
+    <div class="modal" id="createGroupModal">
+        <div class="modal-window">
+            <div class="window-header">
+                <div class="window-title">Create Community Group</div>
+                <div class="window-controls">
+                    <div class="window-control" onclick="closeCreateGroupModal()">X</div>
+                </div>
+            </div>
+            <div class="modal-content">
+                <form id="createGroupForm">
+                    <div class="form-group">
+                        <label class="form-label">Group Name:</label>
+                        <input type="text" class="form-input" name="groupName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description:</label>
+                        <textarea class="form-input form-textarea" name="description" placeholder="What's your group about?"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Token Ticker:</label>
+                            <input type="text" class="form-input" name="ticker" placeholder="$SOL">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Token Name:</label>
+                            <input type="text" class="form-input" name="tokenName" placeholder="Solana">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Contract Address:</label>
+                        <input type="text" class="form-input" name="contractAddress" placeholder="0x... or So11...">
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn" onclick="closeCreateGroupModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button" onclick="toggleStartMenu()">
+            <span>Start</span>
+        </div>
+        <div class="taskbar-separator"></div>
+        <div class="taskbar-items" id="taskbarItems">
+            <!-- Open windows will appear here -->
+        </div>
+        <div class="taskbar-time" id="taskbarTime">12:00 PM</div>
+    </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <header class="header">
-            <div class="logo">Solmegle</div>
-            <button class="feedback-btn" onclick="openModal()">Feedback</button>
-        </header>
+    <script>
+        // Global variables
+        let allTags = [];
+        let twitterHandle = '';
+        let currentChatState = 'setup'; // setup, searching, connected
+        let currentVideoState = 'setup';
+        let isMuted = false;
+        let isVideoOff = false;
+        let localStream = null;
+        let peerConnection = null;
+        let ws = null;
+        let groups = [];
+        let currentGroupId = null;
+        let participants = new Map();
 
-        <div class="content-wrapper">
-            <div class="background-orb"></div>
+        // Window management
+        function openWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.classList.add('active');
+            updateTaskbar();
+            bringToFront(windowId);
+        }
+
+        function closeWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.classList.remove('active');
+            updateTaskbar();
             
-            <div class="options-container">
-                <!-- Interests Section -->
-                <div class="interests-section">
-                    <h2 class="section-title">What interests you?</h2>
-                    
-                    <div class="input-group">
-                        <input type="text" class="input-field" id="interests" placeholder="Add interests (optional)" />
+            // Cleanup if closing video windows
+            if (windowId === 'videoWindow' || windowId === 'groupCallWindow') {
+                if (localStream) {
+                    localStream.getTracks().forEach(track => track.stop());
+                }
+                if (peerConnection) {
+                    peerConnection.close();
+                }
+            }
+        }
+
+        function minimizeWindow(windowId) {
+            const window = document.getElementById(windowId);
+            window.classList.remove('active');
+            updateTaskbar();
+        }
+
+        function bringToFront(windowId) {
+            const windows = document.querySelectorAll('.window');
+            windows.forEach(w => w.style.zIndex = '1000');
+            document.getElementById(windowId).style.zIndex = '1001';
+        }
+
+        function updateTaskbar() {
+            const taskbarItems = document.getElementById('taskbarItems');
+            taskbarItems.innerHTML = '';
+            
+            const activeWindows = document.querySelectorAll('.window.active');
+            activeWindows.forEach(window => {
+                const item = document.createElement('div');
+                item.className = 'taskbar-item';
+                item.textContent = window.querySelector('.window-title').textContent;
+                item.onclick = () => bringToFront(window.id);
+                taskbarItems.appendChild(item);
+            });
+        }
+
+        // Time update
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('taskbarTime').textContent = timeString;
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // Interest tags functionality
+        document.getElementById('interests').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                const value = this.value.trim();
+                if (value && !allTags.includes(value)) {
+                    allTags.push(value);
+                    addTag(value);
+                    this.value = '';
+                }
+            }
+        });
+
+        function addTag(text) {
+            const container = document.getElementById('tagsContainer');
+            const tag = document.createElement('div');
+            tag.className = 'tag';
+            tag.innerHTML = `${escapeHtml(text)} <span onclick="removeTag('${text}', this.parentElement)" style="cursor: pointer; margin-left: 4px;">×</span>`;
+            container.appendChild(tag);
+        }
+
+        function removeTag(text, element) {
+            allTags = allTags.filter(tag => tag !== text);
+            element.remove();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Twitter handle functionality
+        document.getElementById('twitterHandle').addEventListener('input', function(e) {
+            let value = this.value;
+            if (value.startsWith('@')) {
+                value = value.substring(1);
+            }
+            twitterHandle = value;
+            this.value = value;
+        });
+
+        // Chat functionality
+        function startChat() {
+            if (currentChatState !== 'setup') return;
+            
+            currentChatState = 'searching';
+            document.querySelector('.chat-setup').style.display = 'none';
+            document.getElementById('chatArea').style.display = 'block';
+            
+            const messages = document.getElementById('messages');
+            messages.innerHTML = '<div class="message-status">Looking for someone to chat with...</div>';
+            
+            // Simulate finding someone after 2-5 seconds
+            setTimeout(() => {
+                if (currentChatState === 'searching') {
+                    connectToStranger();
+                }
+            }, Math.random() * 3000 + 2000);
+        }
+
+        function connectToStranger() {
+            currentChatState = 'connected';
+            const messages = document.getElementById('messages');
+            
+            let statusMsg = 'You are now chatting with a random stranger.';
+            if (allTags.length > 0) {
+                const commonInterests = allTags[Math.floor(Math.random() * allTags.length)];
+                statusMsg += ` You both like ${commonInterests}.`;
+            }
+            
+            messages.innerHTML = `<div class="message-status">${statusMsg}</div>`;
+            
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendBtn').disabled = false;
+            document.getElementById('skipBtn').disabled = false;
+            
+            // Show twitter handle if provided
+            if (twitterHandle) {
+                setTimeout(() => {
+                    addChatMessage('system', `Stranger can see your Twitter: @${twitterHandle}`);
+                }, 1000);
+            }
+            
+            // Simulate stranger messages occasionally
+            setTimeout(() => {
+                if (currentChatState === 'connected') {
+                    addChatMessage('stranger', 'Hello! How are you?');
+                }
+            }, 3000);
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message || currentChatState !== 'connected') return;
+            
+            addChatMessage('you', message);
+            input.value = '';
+            
+            // Simulate stranger response
+            setTimeout(() => {
+                if (currentChatState === 'connected') {
+                    const responses = [
+                        'That\'s interesting!',
+                        'I see what you mean.',
+                        'Tell me more about that.',
+                        'Cool!',
+                        'Really?',
+                        'Nice!'
+                    ];
+                    const response = responses[Math.floor(Math.random() * responses.length)];
+                    addChatMessage('stranger', response);
+                }
+            }, Math.random() * 2000 + 1000);
+        }
+
+        function addChatMessage(sender, message) {
+            const messages = document.getElementById('messages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            
+            if (sender === 'you') {
+                msgDiv.innerHTML = `<span class="message-you">You:</span> ${escapeHtml(message)}`;
+            } else if (sender === 'stranger') {
+                msgDiv.innerHTML = `<span class="message-stranger">Stranger:</span> ${escapeHtml(message)}`;
+            } else {
+                msgDiv.innerHTML = `<span style="color: #008000;">${escapeHtml(message)}</span>`;
+            }
+            
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function skipStranger() {
+            currentChatState = 'searching';
+            const messages = document.getElementById('messages');
+            messages.innerHTML = '<div class="message-status">Stranger disconnected. Looking for someone new...</div>';
+            
+            document.getElementById('messageInput').disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+            document.getElementById('skipBtn').disabled = true;
+            
+            setTimeout(() => {
+                if (currentChatState === 'searching') {
+                    connectToStranger();
+                }
+            }, Math.random() * 3000 + 2000);
+        }
+
+        // Video chat functionality
+        async function startVideoChat() {
+            if (currentVideoState !== 'setup') return;
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                    audio: true
+                });
+                
+                document.getElementById('selfVideo').srcObject = localStream;
+                
+                if (twitterHandle) {
+                    document.getElementById('selfOverlay').textContent = `@${twitterHandle}`;
+                    document.getElementById('selfOverlay').style.display = 'block';
+                }
+                
+                currentVideoState = 'searching';
+                document.getElementById('startVideoBtn').disabled = true;
+                document.getElementById('muteBtn').disabled = false;
+                document.getElementById('videoBtn').disabled = false;
+                document.getElementById('skipVideoBtn').disabled = false;
+                
+                const messages = document.getElementById('videoMessages');
+                messages.innerHTML = '<div class="message-status">Looking for someone to video chat with...</div>';
+                
+                // Simulate finding someone
+                setTimeout(() => {
+                    if (currentVideoState === 'searching') {
+                        connectToVideoStranger();
+                    }
+                }, Math.random() * 3000 + 2000);
+                
+            } catch (error) {
+                alert('Camera and microphone access is required for video chat.');
+            }
+        }
+
+        function connectToVideoStranger() {
+            currentVideoState = 'connected';
+            const messages = document.getElementById('videoMessages');
+            messages.innerHTML = '<div class="message-status">Connected! You are now video chatting.</div>';
+            
+            // Simulate peer video (black screen with text)
+            const peerVideo = document.getElementById('peerVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 480;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#202020';
+            ctx.fillRect(0, 0, 640, 480);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Stranger\'s Video', 320, 240);
+            
+            const stream = canvas.captureStream();
+            peerVideo.srcObject = stream;
+            
+            document.getElementById('peerOverlay').textContent = '@stranger_user';
+            document.getElementById('peerOverlay').style.display = 'block';
+            
+            document.getElementById('videoMessageInput').disabled = false;
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('muteBtn');
+            btn.textContent = isMuted ? 'Unmute' : 'Mute';
+            btn.style.background = isMuted ? '#ff4040' : '#c0c0c0';
+            
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMuted;
+                });
+            }
+        }
+
+        function toggleVideo() {
+            isVideoOff = !isVideoOff;
+            const btn = document.getElementById('videoBtn');
+            btn.textContent = isVideoOff ? 'Video On' : 'Video Off';
+            btn.style.background = isVideoOff ? '#ff4040' : '#c0c0c0';
+            
+            if (localStream) {
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = !isVideoOff;
+                });
+            }
+        }
+
+        function skipVideo() {
+            currentVideoState = 'searching';
+            const messages = document.getElementById('videoMessages');
+            messages.innerHTML = '<div class="message-status">Looking for someone new...</div>';
+            
+            document.getElementById('peerVideo').srcObject = null;
+            document.getElementById('peerOverlay').style.display = 'none';
+            document.getElementById('videoMessageInput').disabled = true;
+            
+            setTimeout(() => {
+                if (currentVideoState === 'searching') {
+                    connectToVideoStranger();
+                }
+            }, Math.random() * 3000 + 2000);
+        }
+
+        function sendVideoMessage() {
+            const input = document.getElementById('videoMessageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addVideoMessage('you', message);
+            input.value = '';
+        }
+
+        function addVideoMessage(sender, message) {
+            const messages = document.getElementById('videoMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            
+            if (sender === 'you') {
+                msgDiv.innerHTML = `<span class="message-you">You:</span> ${escapeHtml(message)}`;
+            } else {
+                msgDiv.innerHTML = `<span class="message-stranger">Stranger:</span> ${escapeHtml(message)}`;
+            }
+            
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Groups functionality
+        function loadGroups() {
+            const grid = document.getElementById('groupsGrid');
+            
+            if (groups.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #808080;">No groups created yet. Be the first to start a community!</div>';
+                return;
+            }
+            
+            grid.innerHTML = '';
+            groups.forEach(group => {
+                const card = document.createElement('div');
+                card.className = 'group-card';
+                card.onclick = () => joinGroup(group.id);
+                
+                const ticker = group.ticker || '$TOKEN';
+                const icon = ticker.replace(', '').substring(0, 3);
+                
+                card.innerHTML = `
+                    <div class="group-header">
+                        <div class="group-icon">${icon}</div>
+                        <div>
+                            <div class="group-name">${escapeHtml(group.name)}</div>
+                            <div class="group-ticker">${escapeHtml(ticker)}</div>
+                        </div>
                     </div>
-                    
-                    <div class="input-group twitter-input">
-                        <input type="text" class="input-field" id="twitter" placeholder="Your Twitter handle (optional)" />
+                    <div class="group-description">${escapeHtml(group.description || 'No description')}</div>
+                    <div class="group-stats">
+                        <span>${group.members || 0} members</span>
+                        <span>Active now</span>
                     </div>
-                    
-                    <div class="tags-container" id="tags-container"></div>
-                </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
 
-                <!-- Chat Section -->
-                <div class="chat-section">
-                    <h2 class="section-title">Start Chatting</h2>
-                    <div class="chat-buttons">
-                        <button class="chat-btn text-btn" onclick="startGroupChat()">Group Calls</button>
-                        <span class="or-text">or</span>
-                        <button class="chat-btn video-btn" onclick="startVideoChat()">Video Chat</button>
-                    </div>
-                </div>
-            </div>
+        function openCreateGroupModal() {
+            document.getElementById('createGroupModal').classList.add('active');
+        }
 
-            <div class="disclaimer">
-                <p>By using Solmegle, you agree that you are 18+ years old. Be respectful and follow community guidelines. 
-                We are not responsible for user behavior. Disconnect if you feel uncomfortable.</p>
-            </div>
-        </div>
-    </div>
+        function closeCreateGroupModal() {
+            document.getElementById('createGroupModal').classList.remove('active');
+            document.getElementById('createGroupForm').reset();
+        }
 
-    <!-- Feedback Modal -->
-    <div id="feedbackModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2>Send Feedback</h2>
-            <form onsubmit="submitFeedback(event)">
-                <textarea id="feedbackText" placeholder="Your feedback..." required></textarea>
-                <button type="submit" class="submit-btn">Submit</button>
-            </form>
-        </div>
-    </div>
+        function createGroup(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            
+            const group = {
+                id: Date.now().toString(),
+                name: formData.get('groupName'),
+                description: formData.get('description'),
+                ticker: formData.get('ticker'),
+                tokenName: formData.get('tokenName'),
+                contractAddress: formData.get('contractAddress'),
+                members: 1,
+                created: new Date()
+            };
+            
+            groups.push(group);
+            loadGroups();
+            closeCreateGroupModal();
+        }
 
-    <script defer src="./js/main.js"></script>
-    <script defer src="./js/landing.js"></script>
+        function joinGroup(groupId) {
+            currentGroupId = groupId;
+            const group = groups.find(g => g.id === groupId);
+            
+            closeWindow('groupsWindow');
+            openWindow('groupCallWindow');
+            
+            document.getElementById('groupCallTitle').textContent = `${group.name} - Group Call`;
+            
+            // Initialize group call
+            initGroupCall();
+        }
+
+        async function initGroupCall() {
+            try {
+                if (!localStream) {
+                    localStream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: true
+                    });
+                }
+                
+                // Add self to participants
+                addParticipant('self', localStream, twitterHandle);
+                
+                // Simulate other participants joining
+                setTimeout(() => addParticipant('user1', createDummyStream(), 'crypto_dev'), 2000);
+                setTimeout(() => addParticipant('user2', createDummyStream(), 'blockchain_fan'), 4000);
+                
+            } catch (error) {
+                alert('Camera and microphone access is required for group calls.');
+            }
+        }
+
+        function createDummyStream() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 320;
+            canvas.height = 240;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
+            ctx.fillRect(0, 0, 320, 240);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Participant', 160, 120);
+            return canvas.captureStream();
+        }
+
+        function addParticipant(id, stream, handle) {
+            const grid = document.getElementById('participantsGrid');
+            
+            const participant = document.createElement('div');
+            participant.className = 'participant';
+            participant.id = `participant-${id}`;
+            
+            const video = document.createElement('video');
+            video.className = 'participant-video';
+            video.autoplay = true;
+            video.playsInline = true;
+            video.muted = id === 'self';
+            video.srcObject = stream;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'participant-overlay';
+            overlay.textContent = handle ? `@${handle}` : (id === 'self' ? 'You' : 'Participant');
+            
+            participant.appendChild(video);
+            participant.appendChild(overlay);
+            grid.appendChild(participant);
+            
+            participants.set(id, { element: participant, stream, handle });
+            
+            // Add join message
+            if (id !== 'self') {
+                addGroupMessage('system', `${handle || 'Participant'} joined the call`);
+            }
+        }
+
+        function toggleGroupMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('groupMuteBtn');
+            btn.classList.toggle('active', isMuted);
+            
+            if (localStream) {
+                localStream.getAudioTracks().forEach(track => {
+                    track.enabled = !isMuted;
+                });
+            }
+        }
+
+        function toggleGroupVideo() {
+            isVideoOff = !isVideoOff;
+            const btn = document.getElementById('groupVideoBtn');
+            btn.classList.toggle('active', isVideoOff);
+            
+            if (localStream) {
+                localStream.getVideoTracks().forEach(track => {
+                    track.enabled = !isVideoOff;
+                });
+            }
+        }
+
+        function toggleScreenShare() {
+            const btn = document.getElementById('screenBtn');
+            btn.classList.toggle('active');
+            // Screen sharing functionality would go here
+        }
+
+        function sendGroupMessage() {
+            const input = document.getElementById('groupMessageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            addGroupMessage('you', message);
+            input.value = '';
+            
+            // Simulate responses
+            setTimeout(() => {
+                const responses = ['Great point!', 'Agreed!', 'Interesting!', 'Thanks for sharing'];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                addGroupMessage('other', response);
+            }, Math.random() * 2000 + 1000);
+        }
+
+        function addGroupMessage(sender, message) {
+            const messages = document.getElementById('groupMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            
+            if (sender === 'you') {
+                msgDiv.innerHTML = `<span class="message-you">You:</span> ${escapeHtml(message)}`;
+            } else if (sender === 'system') {
+                msgDiv.innerHTML = `<span style="color: #008000;">${escapeHtml(message)}</span>`;
+            } else {
+                msgDiv.innerHTML = `<span class="message-stranger">Member:</span> ${escapeHtml(message)}`;
+            }
+            
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function leaveGroupCall() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+                localStream = null;
+            }
+            
+            participants.clear();
+            currentGroupId = null;
+            closeWindow('groupCallWindow');
+            openWindow('groupsWindow');
+        }
+
+        // Event listeners
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('videoMessageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendVideoMessage();
+            }
+        });
+
+        document.getElementById('groupMessageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendGroupMessage();
+            }
+        });
+
+        document.getElementById('createGroupForm').addEventListener('submit', createGroup);
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadGroups();
+            updateTime();
+        });
+
+        // Make windows draggable
+        function makeDraggable(element) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = element.querySelector('.window-header');
+            
+            header.onmousedown = dragMouseDown;
+            
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+                bringToFront(element.id);
+            }
+            
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                element.style.top = (element.offsetTop - pos2) + "px";
+                element.style.left = (element.offsetLeft - pos1) + "px";
+            }
+            
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        // Make all windows draggable
+        document.querySelectorAll('.window').forEach(makeDraggable);
+    </script>
 </body>
 </html>
