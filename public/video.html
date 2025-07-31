@@ -1,81 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <title>Ajnabee</title>
-  <link rel="icon" href="img/favicon.png" />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-  <link href="css/style.css" rel="stylesheet" />
-  <link href="css/phone.css" rel="stylesheet" />
-  <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-  <link rel="manifest" href="favicon/site.webmanifest">
-  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
-  <meta name="favicon/msapplication-TileColor" content="#da532c">
-  <meta name="favicon/theme-color" content="#333333">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solmegle - Video Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/video.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="favicon/msapplication-TileColor" content="#da532c">
+    <meta name="favicon/theme-color" content="#333333">
 </head>
-
 <body>
-  <div id="main">
-    <!-- top bar -->
-    <div id="top-bar">
-      <div id="logo">
-        <img width=20px src="/assets/logo.svg" alt="Ajnabee">
-      </div>
-      <div id="top-right">
-        <div id="peopleOnline">
-          <p><span>0</span>+ online now</p>
+    <!-- Main Container -->
+    <div class="main-container" id="mainContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo" onclick="window.location.href='/'">Solmegle</div>
+            <button class="feedback-btn">Feedback</button>
         </div>
-        <button id="feedback-btn" class="button">Provide Feedback</button>
-      </div>
+
+        <!-- Video Container -->
+        <div class="video-container">
+            <!-- Peer Video -->
+            <div class="video-feed peer-video">
+                <video class="video-element" id="peerVideo" autoplay playsinline></video>
+                <div class="loading-spinner" id="peerLoader"></div>
+                <div class="video-overlay" id="peerTwitter" style="display: none;">
+                    <span class="twitter-handle">@username</span>
+                </div>
+            </div>
+            
+            <!-- Self Video -->
+            <div class="video-feed self-video">
+                <video class="video-element" id="selfVideo" autoplay playsinline muted></video>
+                <div class="video-overlay" id="selfTwitter" style="display: none;">
+                    <span class="twitter-handle">@myhandle</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area" id="messagesArea">
+            <div class="message-status">Looking for someone to video chat with...</div>
+            <div class="typing-indicator" id="typingIndicator">Stranger is typing...</div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <button class="skip-btn" id="skipBtn">Skip</button>
+            <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." disabled>
+            <button class="send-btn" id="sendBtn" disabled>Send</button>
+        </div>
     </div>
 
-    <!-- video container -->
-    <div id="videos">
-      <div id="peer">
-        <video class="video-player mirror" id="video-peer" autoplay playsinline></video>
-        <div id="peer-video-loader"></div>
-        <img src="/assets/logo.svg" alt="ajnabee" id="watermark">
-      </div>
-      <div id="self">
-        <video class="video-player mirror" id="video-self" autoplay playsinline muted="muted"></video>
-      </div>
+    <!-- Onboarding Modal -->
+    <div class="onboarding-modal" id="onboardingModal">
+        <div class="modal-content">
+            <!-- Slide 1: Welcome -->
+            <div class="slide active" data-slide="0">
+                <div class="slide-image">
+                    <!-- Placeholder for welcome/intro screenshot -->
+                    <span>Welcome Screenshot</span>
+                </div>
+                <h2>Welcome to Video Chat</h2>
+                <p>You're about to start video chatting with random strangers! Let's quickly show you how everything works.</p>
+            </div>
+
+            <!-- Slide 2: Camera Setup -->
+            <div class="slide" data-slide="1">
+                <div class="slide-image">
+                    <!-- Placeholder for camera permission screenshot -->
+                    <span>Camera Permission Screenshot</span>
+                </div>
+                <h2>Camera & Audio</h2>
+                <p>We'll ask for camera and microphone access. Your video appears in the smaller window, and your chat partner's video fills the main area.</p>
+            </div>
+
+            <!-- Slide 3: Twitter Integration -->
+            <div class="slide" data-slide="2">
+                <div class="slide-image">
+                    <!-- Placeholder for Twitter handle display screenshot -->
+                    <span>Twitter Handle Display Screenshot</span>
+                </div>
+                <h2>Twitter Handle Display</h2>
+                <p>If you entered a Twitter handle, it will appear in the bottom-left of your video so others can find you later!</p>
+            </div>
+
+            <!-- Slide 4: Chat Features -->
+            <div class="slide" data-slide="3">
+                <div class="slide-image">
+                    <!-- Placeholder for chat interface screenshot -->
+                    <span>Chat Interface Screenshot</span>
+                </div>
+                <h2>Text + Video</h2>
+                <p>You can text chat alongside video! Type messages on the right side while you're video chatting.</p>
+            </div>
+
+            <!-- Slide 5: Safety -->
+            <div class="slide" data-slide="4">
+                <div class="slide-image">
+                    <!-- Placeholder for safety/skip button screenshot -->
+                    <span>Safety Features Screenshot</span>
+                </div>
+                <h2>Stay Safe</h2>
+                <p>If anyone makes you uncomfortable, click "Skip" immediately to find someone new. Keep your personal info private!</p>
+            </div>
+
+            <!-- Navigation -->
+            <div class="modal-navigation">
+                <button class="nav-btn back-btn" id="backBtn" onclick="previousSlide()">Back</button>
+                
+                <div class="progress-dots" id="progressDots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextSlide()">Next</button>
+            </div>
+        </div>
     </div>
 
-    <!-- message area -->
-    <div id="message-area">
-      <div id="messages"></div>
-      <div id="typing" style="display: none" class="message">Stranger is typing...</div>
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Send Feedback</h2>
+            <form onsubmit="submitFeedback(event)">
+                <textarea id="feedbackText" placeholder="Your feedback..." required></textarea>
+                <button type="submit" class="submit-btn">Submit</button>
+            </form>
+        </div>
     </div>
 
-
-    <!-- input area -->
-    <div id="input-area">
-      <button class="button" id="skip-btn">Skip<span>Esc</span></button>
-      <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" />
-      <button class="button" id="send-btn">Send<span>Enter</span></button>
-    </div>
-  </div>
-
-  <!-- feedback popup -->
-  <div id="feedbackModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2>Provide Feedback</h2>
-      <form id="feedbackForm">
-        <textarea id="feedbackText" rows="10" placeholder="Your feedback..." required></textarea>
-        <input type="submit" class="button" id="submit-btn" value="Submit" />
-      </form>
-    </div>
-  </div>
-
-  <script defer src="./js/main.js"></script>
-  <script defer src="./js/video.js" type="module"></script>
+    <script defer src="./js/main.js"></script>
+    <script defer src="./js/video.js"></script>
 </body>
-
 </html>
